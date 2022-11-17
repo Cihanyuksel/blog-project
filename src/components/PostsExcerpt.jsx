@@ -15,7 +15,7 @@ import {
   ModalOverlay,
   useDisclosure,
 } from "@chakra-ui/react";
-import { useRef, useState } from "react";
+import { useRef} from "react";
 import EditPostForm from "./EditPostForm";
 import { deletePost } from "../services";
 import { useDispatch } from "react-redux";
@@ -24,17 +24,13 @@ const PostsExcerpt = ({ post }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const finalRef = useRef(null);
 
-  // const [requestStatus, setRequestStatus] = useState("idle");
   const dispatch = useDispatch();
 
   const onDeletePostClicked = async () => {
     try {
-        // setRequestStatus('pending')
         await dispatch(deletePost({ id: post.id })).unwrap()
     } catch (err) {
         console.error('Failed to delete the post', err)
-    } finally {
-        // setRequestStatus('idle')
     }
   }
 
