@@ -25,7 +25,6 @@ import PostsExcerpt from "./PostsExcerpt";
 import { fetchPosts } from "../services";
 
 const PostList = () => {
-  
   const posts = useSelector(selectAllPosts);
   const postsStatus = useSelector(getPostsStatus);
   const error = useSelector(getPostsError);
@@ -33,7 +32,9 @@ const PostList = () => {
   const dispatch = useDispatch();
 
   const [currentPage, setCurrentPage] = useState(1);
-  const [postsPerPage, setPostsPerPage] = useState(localStorage.getItem("postsPerPage"));
+  const [postsPerPage, setPostsPerPage] = useState(
+    localStorage.getItem("postsPerPage")
+  );
   const [currentButton, setCurrentButton] = useState(1);
 
   const indexOfLastPost = currentPage * postsPerPage; //1 * 9
@@ -54,7 +55,12 @@ const PostList = () => {
     content = <p>Loading...</p>;
   } else if (postsStatus === "succeeded") {
     content = currentPosts.map((post) => (
-      <PostsExcerpt key={post.id} post={post} />
+      <PostsExcerpt
+        key={post.id}
+        post={post}
+        postsPerPage={postsPerPage}
+        setCurrentButton={setCurrentButton}
+      />
     ));
   } else if (postsStatus === "failed") {
     content = <p>{error}</p>;
@@ -64,10 +70,30 @@ const PostList = () => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const finalRef = useRef(null);
 
+  // grid design
+  const gridDesign = (item) => {
+    switch (item) {
+      case "5":
+        return "repeat(1, 1fr)";
+      case "10":
+        return "repeat(2, 1fr)";
+      case "15":
+        return "repeat(3, 1fr)";
+      default:
+        console.log("asfa");
+    }
+  };
+
   return (
-    <Box bg="gray.200" p={4} borderRadius={5}>
+    <Box bg="gray.200" p={2}>
       <Box>
-        <Button mt={4} onClick={onOpen} bg="blue.600" color="white" marginBlock={5}>
+        <Button
+          mt={4}
+          onClick={onOpen}
+          bg="blue.600"
+          color="white"
+          marginBlock={5}
+        >
           Add New Post
         </Button>
         <Modal finalFocusRef={finalRef} isOpen={isOpen} onClose={onClose}>
@@ -89,7 +115,7 @@ const PostList = () => {
             </ModalFooter>
           </ModalContent>
         </Modal>
-        <Grid templateColumns="repeat(3, 1fr)" gap={6}>
+        <Grid templateColumns={gridDesign(postsPerPage)} gap={5}>
           {content}
         </Grid>
       </Box>

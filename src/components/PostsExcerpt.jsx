@@ -4,7 +4,6 @@ import TimeAgo from "./TimeAgo";
 import {
   Button,
   Box,
-  Container,
   Text,
   Modal,
   ModalBody,
@@ -15,12 +14,12 @@ import {
   ModalOverlay,
   useDisclosure,
 } from "@chakra-ui/react";
-import { useRef} from "react";
+import { useRef } from "react";
 import EditPostForm from "./EditPostForm";
 import { deletePost } from "../services";
 import { useDispatch } from "react-redux";
 
-const PostsExcerpt = ({ post }) => {
+const PostsExcerpt = ({ post, postsPerPage, setCurrentButton }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const finalRef = useRef(null);
 
@@ -28,15 +27,22 @@ const PostsExcerpt = ({ post }) => {
 
   const onDeletePostClicked = async () => {
     try {
-        await dispatch(deletePost({ id: post.id })).unwrap()
+      await dispatch(deletePost({ id: post.id })).unwrap();
     } catch (err) {
-        console.error('Failed to delete the post', err)
+      console.error("Failed to delete the post", err);
     }
-  }
+  };
 
+  const trunciate = (content, slice) => {
+    if (content.length > 20) {
+      return `${content.slice(0, slice)}...`;
+    } else {
+      return content;
+    }
+  };
 
   return (
-    <Container key={post.id}>
+    <Box key={post.id}>
       <Box
         borderWidth="2px"
         borderRadius="lg"
@@ -45,25 +51,49 @@ const PostsExcerpt = ({ post }) => {
         justifyContent="space-evenly"
         gap={1}
         h="300px"
+        w="100%"
         p={5}
         borderColor="gray.500"
       >
         <Text fontSize="xl" fontWeight="bold">
-          {post.title.substring(0, 30)}...
+          {postsPerPage === "5"
+            ? trunciate(post.title)
+            : trunciate(post.title, 20)}
         </Text>
-        <Text>{post.body.substring(0, 100)}...</Text>
+        <Text>
+          {postsPerPage === "5"
+            ? trunciate(post.body)
+            : trunciate(post.body, 100)}
+        </Text>
         <Box>
           <PostAuthor userId={post.userId} />
           <TimeAgo timestamp={post.date} />
         </Box>
         <ReactionButtons post={post} />
-        <Box display="flex" justifyContent="space-around">
-        <Button onClick={onOpen} bg="blue.600" color="#fff" _hover={{color: "black"}} w="40%">
-          Edit
-        </Button>
-        <Button onClick={onDeletePostClicked} bg="red.600" color="#fff" _hover={{color: "black"}} w="40%">
-          Delete
-        </Button>
+        <Box display="flex" gap={5}>
+          <Button
+            onClick={onOpen}
+            bg="blue.600"
+            color="#fff"
+            _hover={{ color: "black" }}
+            // w={postsPerPage === "5" ? "7%" : "15%"}    
+            w="70px"
+            h="40px"        
+            px="16px"
+          >
+            Edit
+          </Button>
+          <Button
+            onClick={onDeletePostClicked}
+            bg="red.600"
+            color="#fff"
+            _hover={{ color: "black" }}
+            w="70px"
+            h="40px"        
+            px="16px"
+          >
+            Delete
+          </Button>
         </Box>
       </Box>
       <Modal finalFocusRef={finalRef} isOpen={isOpen} onClose={onClose}>
@@ -72,7 +102,7 @@ const PostsExcerpt = ({ post }) => {
           <ModalHeader>Edit</ModalHeader>
           <ModalCloseButton />
           <ModalBody>
-            <EditPostForm onClose={onClose} post={post} />
+            <EditPostForm onClose={onClose} post={post} setCurrentButton={setCurrentButton} />
           </ModalBody>
 
           <ModalFooter>
@@ -82,7 +112,7 @@ const PostsExcerpt = ({ post }) => {
           </ModalFooter>
         </ModalContent>
       </Modal>
-    </Container>
+    </Box>
   );
 };
 

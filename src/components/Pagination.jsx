@@ -19,13 +19,27 @@ const Pagination = ({
     setCurrentPage(currentButton);
   }, [currentButton, setCurrentPage]);
 
-  const prev = () => {
-    setCurrentButton((prev) => (prev === 1 ? prev : prev - 1));
-  };
-  const next = () => {
-    setCurrentButton((prev) => (prev === numOfPages.length ? prev : prev + 1));
+  const smoothScroll = {
+    top: 0,
+    left: 0,
+    behavior: "smooth",
   };
 
+  const prev = () => {
+    setCurrentButton((prev) => (prev === 1 ? prev : prev - 1));
+    if(currentButton === 1) {
+      return
+    }
+    window.scrollTo(smoothScroll);
+  };
+
+  const next = () => {
+    setCurrentButton((prev) => (prev === numOfPages.length ? prev : prev + 1));
+    if(currentButton === totalPageNum) {
+      return
+    }
+    window.scrollTo(smoothScroll);
+  };
   useEffect(() => {
     localStorage.setItem("postsPerPage", postsPerPage);
   }, [postsPerPage]);
@@ -38,7 +52,7 @@ const Pagination = ({
         listStyleType="none"
       >
         <ListItem>
-          <Button marginRight={1} onClick={() => prev()}>
+          <Button marginRight={1} onClick={() => prev()} disabled={currentButton === 1}>
             Previous
           </Button>
         </ListItem>
@@ -57,7 +71,7 @@ const Pagination = ({
           );
         })}
         <ListItem>
-          <Button onClick={() => next()}>Next</Button>
+          <Button onClick={() => next()} disabled={currentButton === totalPageNum}>Next</Button>
         </ListItem>
         <Select
           w="100px"
@@ -70,10 +84,9 @@ const Pagination = ({
           }}
           defaultValue={localStorage.getItem("postsPerPage")}
         >
-          <option value="">Select</option>
-          <option value="6">6</option>
-          <option value="12">12</option>
-          <option value="18">18</option>
+          <option value="5">5</option>
+          <option value="10">10</option>
+          <option value="15">15</option>
         </Select>
       </UnorderedList>
     </Box>

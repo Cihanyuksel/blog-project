@@ -13,7 +13,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { selectAllUsers } from "../features/userSlice";
 import { updatePost } from "../services";
 
-const EditPostForm = ({ post }) => {
+const EditPostForm = ({ post, onClose, setCurrentButton }) => {
   const users = useSelector(selectAllUsers);
   const dispatch = useDispatch();
 
@@ -33,20 +33,26 @@ const EditPostForm = ({ post }) => {
 
   const onSavePostClicked = () => {
     if (canSave) {
-        try {
-            setRequestStatus('pending')
-            dispatch(updatePost({userId, id: post.id, title, body: content,  reactions: post.reactions }))
-
-            setTitle('')
-            setContent('')
-            setUserId('')
-        } catch (err) {
-            console.error('Failed to save the post', err)
-        } finally {
-            setRequestStatus('idle')
-        }
+      try {
+        setRequestStatus("pending");
+        dispatch(
+          updatePost({
+            userId,
+            id: post.id,
+            title,
+            body: content,
+            reactions: post.reactions,
+          })
+        );
+        setCurrentButton(1);
+      } catch (err) {
+        console.error("Failed to save the post", err);
+      } finally {
+        setRequestStatus("idle");
+      }
+      onClose();
     }
-}
+  };
 
   return (
     <Container centerContent>
@@ -87,7 +93,12 @@ const EditPostForm = ({ post }) => {
               onChange={(e) => setContent(e.target.value)}
             />
           </Box>
-          <Button onClick={onSavePostClicked} colorScheme="teal" size="md" disabled={!canSave}>
+          <Button
+            onClick={onSavePostClicked}
+            colorScheme="teal"
+            size="md"
+            disabled={!canSave}
+          >
             Save Post
           </Button>
         </FormControl>

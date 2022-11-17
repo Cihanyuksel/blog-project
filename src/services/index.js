@@ -6,14 +6,14 @@ const BASE_URL = "https://jsonplaceholder.typicode.com";
 // posts
 export const fetchPosts = createAsyncThunk("posts/fetchPosts", async () => {
   const response = await axios.get(`${BASE_URL}/posts`);
-  return response.data;
+  return response.data.slice(0, 60)
 });
 
 export const addNewPost = createAsyncThunk(
   "posts/addNewPost",
   async (initialPost) => {
     const response = await axios.post(`${BASE_URL}/users`, initialPost);
-    return response.data;
+    return response.data
   }
 );
 
